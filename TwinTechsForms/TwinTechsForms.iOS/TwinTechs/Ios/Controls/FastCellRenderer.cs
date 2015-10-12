@@ -28,7 +28,7 @@ namespace TwinTechs.Controls
 		{
 			_fastCell = fastCell;
 			_fastCell.PrepareCell ();
-//			_fastCell.OriginalBindingContext = _fastCell.BindingContext;
+			_fastCell.OriginalBindingContext = _fastCell.BindingContext;
 
 			var renderer = RendererFactory.GetRenderer (fastCell.View);
 			_view = renderer.NativeView;
@@ -54,6 +54,9 @@ namespace TwinTechs.Controls
 			if (_lastSize.Equals (CGSize.Empty) || !_lastSize.Equals (Frame.Size)) {
 
 				var layout = _fastCell.View as Layout<View>;
+//				if (layout == null) {
+//					layout = _fastCell.View as ContentView;
+//				}
 				if (layout != null) {
 					layout.Layout (Frame.ToRectangle ());
 					layout.ForceLayout ();
@@ -97,7 +100,7 @@ namespace TwinTechs.Controls
 			var fastCell = item as FastCell;
 			var nativeCell = reusableCell as NativeCell;
 
-			if (reusableCell != null && cellCache.IsCached (nativeCell)) {
+			if (reusableCell != null && cellCache.IsCached (nativeCell, fastCell.ReuseIdentifier)) {
 				cellCache.RecycleCell (nativeCell, fastCell);
 			} else {
 				var newCell = (FastCell)Activator.CreateInstance (item.GetType ());

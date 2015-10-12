@@ -89,7 +89,7 @@ namespace TwinTechs.Droid.Controls
 			
 			Android.Views.View cellCore = convertView;
 			
-			if (cellCore != null && cellCache.IsCached (cellCore)) {
+			if (cellCore != null && cellCache.IsCached (cellCore, fastCell.ReuseIdentifier)) {
 				cellCache.RecycleCell (cellCore, fastCell);
 			} else {
 				var newCell = (FastCell) Activator.CreateInstance (item.GetType ());

@@ -67,18 +67,22 @@ namespace TwinTechs.Droid.Controls
 			/// </summary>
 			internal void Reset ()
 			{
-				CellItemsByCoreCells = new Dictionary<Android.Views.View, FastCell> ();
+				CoreItemsByReuseIdentifiers = new Dictionary<string, Dictionary<Android.Views.View, FastCell>> ();
+//				CellItemsByCoreCells = new Dictionary<Android.Views.View, FastCell> ();
 				OriginalBindingContextsForReusedItems = new Dictionary<FastCell, object> ();
 			}
 
-			Dictionary<Android.Views.View,FastCell> CellItemsByCoreCells { get; set; }
+			Dictionary<string, Dictionary<Android.Views.View, FastCell>> CoreItemsByReuseIdentifiers { get; set; }
+
+//			Dictionary<Android.Views.View, FastCell> CellItemsByCoreCells { get; set; }
 
 			Dictionary<FastCell,object> OriginalBindingContextsForReusedItems { get; set; }
 
 			public void RecycleCell (Android.Views.View view, FastCell newCell)
 			{
-				if (CellItemsByCoreCells.ContainsKey (view)) {
-					var reusedItem = CellItemsByCoreCells [view];
+				var cellItemsByCoreCells = GetCellItemsByCoreCells (newCell.ReuseIdentifier);
+				if (cellItemsByCoreCells.ContainsKey (view)) {
+					var reusedItem = cellItemsByCoreCells [view];
 					if (OriginalBindingContextsForReusedItems.ContainsKey (newCell)) {
 						reusedItem.BindingContext = OriginalBindingContextsForReusedItems [newCell];
 					} else {
@@ -87,30 +91,40 @@ namespace TwinTechs.Droid.Controls
 				}
 			}
 
-			public bool IsCached (Android.Views.View view)
+			public bool IsCached (Android.Views.View view, string reuseIdentifier)
 			{
-				return CellItemsByCoreCells.ContainsKey (view);
+				var cellItemsByCoreCells = GetCellItemsByCoreCells (reuseIdentifier);
+				return cellItemsByCoreCells.ContainsKey (view);
 			}
 
 			public void CacheCell (FastCell cell, Android.Views.View view)
 			{
-				CellItemsByCoreCells [view] = cell;
+				var cellItemsByCoreCells = GetCellItemsByCoreCells (cell.ReuseIdentifier);
+				cellItemsByCoreCells [view] = cell;
+
 				OriginalBindingContextsForReusedItems [cell] = cell.BindingContext;
 			}
 
-			public object GetBindingContextForReusedCell (FastCell cell)
-			{
-				if (OriginalBindingContextsForReusedItems.ContainsKey (cell)) {
-					return OriginalBindingContextsForReusedItems [cell];
-				} else {
-					return null;
+			private Dictionary<Android.Views.View, FastCell> GetCellItemsByCoreCells(string reuseIdentifier){
+				if (!CoreItemsByReuseIdentifiers.ContainsKey (reuseIdentifier)) {
+					CoreItemsByReuseIdentifiers [reuseIdentifier] = new Dictionary<Android.Views.View, FastCell> ();
 				}
+				return CoreItemsByReuseIdentifiers [reuseIdentifier];
 			}
 
-			void CacheBindingContextForReusedCell (FastCell cell)
-			{
-				OriginalBindingContextsForReusedItems [cell] = cell.BindingContext;
-			}
+//			public object GetBindingContextForReusedCell (FastCell cell)
+//			{
+//				if (OriginalBindingContextsForReusedItems.ContainsKey (cell)) {
+//					return OriginalBindingContextsForReusedItems [cell];
+//				} else {
+//					return null;
+//				}
+//			}
+//
+//			void CacheBindingContextForReusedCell (FastCell cell)
+//			{
+//				OriginalBindingContextsForReusedItems [cell] = cell.BindingContext;
+//			}
 
 
 

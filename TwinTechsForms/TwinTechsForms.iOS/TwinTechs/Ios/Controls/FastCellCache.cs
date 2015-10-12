@@ -67,18 +67,22 @@ namespace TwinTechs.Controls
 			/// </summary>
 			internal void Reset ()
 			{
-				CellItemsByCoreCells = new Dictionary<NativeCell, FastCell> ();
+				CoreItemsByReuseIdentifiers = new Dictionary<string, Dictionary<NativeCell, FastCell>> ();
+//				CellItemsByCoreCells = new Dictionary<NativeCell, FastCell> ();
 				OriginalBindingContextsForReusedItems = new Dictionary<FastCell, object> ();
 			}
 
-			Dictionary<NativeCell,FastCell> CellItemsByCoreCells { get; set; }
+			Dictionary<string, Dictionary<NativeCell,FastCell>> CoreItemsByReuseIdentifiers { get; set; }
+
+//			Dictionary<NativeCell,FastCell> CellItemsByCoreCells { get; set; }
 
 			Dictionary<FastCell,object> OriginalBindingContextsForReusedItems { get; set; }
 
 			public void RecycleCell (NativeCell view, FastCell newCell)
 			{
-				if (CellItemsByCoreCells.ContainsKey (view)) {
-					var reusedItem = CellItemsByCoreCells [view];
+				var cellItemsByCoreCells = GetCellItemsByCoreCells (newCell.ReuseIdentifier);
+				if (cellItemsByCoreCells.ContainsKey (view)) {
+					var reusedItem = cellItemsByCoreCells [view];
 					if (OriginalBindingContextsForReusedItems.ContainsKey (newCell)) {
 						reusedItem.BindingContext = OriginalBindingContextsForReusedItems [newCell];
 					} else {
@@ -87,30 +91,39 @@ namespace TwinTechs.Controls
 				}
 			}
 
-			public bool IsCached (NativeCell view)
+			public bool IsCached (NativeCell view, string reuseIdentifier)
 			{
-				return CellItemsByCoreCells.ContainsKey (view);
+				var cellItemsByCoreCells = GetCellItemsByCoreCells (reuseIdentifier);
+				return cellItemsByCoreCells.ContainsKey (view);
 			}
 
 			public void CacheCell (FastCell cell, NativeCell view)
 			{
-				CellItemsByCoreCells [view] = cell;
+				var cellItemsByCoreCells = GetCellItemsByCoreCells (cell.ReuseIdentifier);
+				cellItemsByCoreCells [view] = cell;
 				OriginalBindingContextsForReusedItems [cell] = cell.BindingContext;
 			}
 
-			public object GetBindingContextForReusedCell (FastCell cell)
-			{
-				if (OriginalBindingContextsForReusedItems.ContainsKey (cell)) {
-					return OriginalBindingContextsForReusedItems [cell];
-				} else {
-					return null;
+			private Dictionary<NativeCell, FastCell> GetCellItemsByCoreCells(string reuseIdentifier){
+				if (!CoreItemsByReuseIdentifiers.ContainsKey (reuseIdentifier)) {
+					CoreItemsByReuseIdentifiers [reuseIdentifier] = new Dictionary<NativeCell, FastCell> ();
 				}
+				return CoreItemsByReuseIdentifiers [reuseIdentifier];
 			}
 
-			void CacheBindingContextForReusedCell (FastCell cell)
-			{
-				OriginalBindingContextsForReusedItems [cell] = cell.BindingContext;
-			}
+//			public object GetBindingContextForReusedCell (FastCell cell)
+//			{
+//				if (OriginalBindingContextsForReusedItems.ContainsKey (cell)) {
+//					return OriginalBindingContextsForReusedItems [cell];
+//				} else {
+//					return null;
+//				}
+//			}
+//
+//			void CacheBindingContextForReusedCell (FastCell cell)
+//			{
+//				OriginalBindingContextsForReusedItems [cell] = cell.BindingContext;
+//			}
 
 
 

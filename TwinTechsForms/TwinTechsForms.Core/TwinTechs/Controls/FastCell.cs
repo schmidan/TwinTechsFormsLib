@@ -16,6 +16,14 @@ namespace TwinTechs.Controls
 			private set;
 		}
 
+		/// <summary>
+		/// Gets or sets the reuse identifier.
+		/// </summary>
+		/// <value>The reuse identifier.</value>
+		public virtual string ReuseIdentifier {
+			get { return "default"; }
+		}
+
 		//		public Layout<Xamarin.Forms.View> Content { get; set; }
 
 		/// <summary>
