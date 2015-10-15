@@ -92,15 +92,21 @@ namespace TwinTechs.Droid.Controls
 			if (cellCore != null && cellCache.IsCached (cellCore, fastCell.ReuseIdentifier)) {
 				cellCache.RecycleCell (cellCore, fastCell);
 			} else {
-				var newCell = (FastCell) Activator.CreateInstance (item.GetType ());
-				newCell.BindingContext = item.BindingContext;
-				newCell.Parent = item.Parent;				
-
-				if (!newCell.IsInitialized) {
-					newCell.PrepareCell ();
+//				var newCell = (FastCell) Activator.CreateInstance (item.GetType ());
+//				newCell.BindingContext = item.BindingContext;
+//				newCell.Parent = item.Parent;				
+//
+//				if (!newCell.IsInitialized) {
+//					newCell.PrepareCell ();
+//				}
+//				cellCore = base.GetCellCore (newCell, convertView, parent, context);
+//				cellCache.CacheCell (newCell, cellCore);
+//
+				if (!fastCell.IsInitialized) {
+					fastCell.PrepareCell ();
 				}
-				cellCore = base.GetCellCore (newCell, convertView, parent, context);
-				cellCache.CacheCell (newCell, cellCore);
+				cellCore = base.GetCellCore (fastCell, convertView, parent, context);
+				cellCache.CacheCell (fastCell, cellCore);
 			}
 			return cellCore;
 		}
